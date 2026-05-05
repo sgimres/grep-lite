@@ -1,9 +1,29 @@
-fn main() {
-    let term = std::env::args().nth(1).expect("no term is given");
-    let user_string = std::env::args().nth(2).expect("no string is gizen");
+use std::{fs::File, io::Read};
 
-    if user_string.contains(&term) {
-        println!("Pattren {} is found on given String", term);
+use clap::Parser;
+
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    #[arg(short, long)]
+    file: String,
+
+    #[arg(short)]
+    pattern: String,
+}
+
+fn main() {
+    let args = Args::parse();
+
+    let pattern = args.pattern;
+    let file_name = args.file;
+    let mut file = File::open(file_name).expect("File not found");
+
+    let mut content = String::new();
+    file.read_to_string(&mut content).unwrap();
+
+    if content.contains(&pattern) {
+        println!("Pattren {} is found on given String", &pattern);
     } else {
         println!("Pattern Not found");
     }
