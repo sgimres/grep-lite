@@ -1,6 +1,7 @@
 use std::{fs::File, io::Read};
 
 use clap::Parser;
+use regex::Regex;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -22,9 +23,17 @@ fn main() {
     let mut content = String::new();
     file.read_to_string(&mut content).unwrap();
 
-    if content.contains(&pattern) {
-        println!("Pattren {} is found on given String", &pattern);
-    } else {
-        println!("Pattern Not found");
+    let re = Regex::new(&pattern).expect("Not a Valid re pattern");
+    let matches = re.find(&content);
+
+    match matches {
+        Some(a) => println!("Pattern is found on {:?}", a),
+        None => println!("No matches are found"),
     }
+
+    // if content.contains(&pattern) {
+    //     println!("Pattren {} is found on given String", &pattern);
+    // } else {
+    //     println!("Pattern Not found");
+    // }
 }
