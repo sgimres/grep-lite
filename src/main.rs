@@ -1,4 +1,7 @@
-use std::{fs::File, io::Read};
+use std::{
+    fs::File,
+    io::{BufRead, BufReader},
+};
 
 use clap::Parser;
 use regex::Regex;
@@ -18,22 +21,17 @@ fn main() {
 
     let pattern = args.pattern;
     let file_name = args.file;
-    let mut file = File::open(file_name).expect("File not found");
 
-    let mut content = String::new();
-    file.read_to_string(&mut content).unwrap();
+    let file = File::open(file_name).expect("File not found");
+    let reader = BufReader::new(file);
 
     let re = Regex::new(&pattern).expect("Not a Valid re pattern");
-    let matches = re.find(&content);
 
-    match matches {
-        Some(a) => println!("Pattern is found on {:?}", a),
-        None => println!("No matches are found"),
+    for line in reader.lines() {
+        let line = line.expect("Error in reading the lines");
+        match re.find(&line) {
+            Some(_) => println!("Found at line: {}", line),
+            None => continue,
+        }
     }
-
-    // if content.contains(&pattern) {
-    //     println!("Pattren {} is found on given String", &pattern);
-    // } else {
-    //     println!("Pattern Not found");
-    // }
 }
